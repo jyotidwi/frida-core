@@ -1,0 +1,76 @@
+name: CI Build
+
+on:
+  push:
+    branches:
+      - origin
+  pull_request:
+    branches:
+      - origin
+
+env:
+  FRIDA_CORE_OPTIONS: '--with-devkits=core --enable-tests'
+
+jobs:
+  native:
+    strategy:
+      matrix:
+        include:
+          - { id: windows-x86_64, runner: '"windows-latest"'                    }
+          - { id: linux-x86_64,   runner: '"ubuntu-latest"'                     }
+      fail-fast: false
+    runs-on: ${{ fromJSON(matrix.runner) }}
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install gcc-multilib
+        if: matrix.id == 'linux-x86'
+        run: sudo apt-get install gcc-multilib lib32stdc++-11-dev
+      - name: Install gcc-multilib
+        if: matrix.id == 'linux-x86_64'
+        run: sudo apt-get install gcc-multilib lib32stdc++-11-dev
+      - name: Build
+        if: matrix.id == 'linux-x86_64'
+        run: |
+          ./configure ${{ env.FRIDA_CORE_OPTIONS }}
+          make
+      - name: Build
+        if: ${{ !startsWith(matrix.id, 'windows-') && matrix.id != 'linux-x86' }}
+        run: |
+          ./configure ${{ env.FRIDA_CORE_OPTIONS }}
+          make
+      - name: Upload devkit
+        if: ${{ !startsWith(matrix.id, 'linux-') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-devkit-${{ matrix.id }}
+          path: build/src/devkit/
+      - name: Test
+        run: make test
+
+  manylinux:
+    strategy:
+      matrix:
+        arch: [x86_64, arm64]
+      fail-fast: false
+    runs-on: ubuntu-latest
+    container: ghcr.io/frida/x-tools-linux-${{ matrix.arch }}:latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Build
+        run: |
+          ./configure --host=$XTOOLS_HOST ${{ env.FRIDA_CORE_OPTIONS }}
+          make
+      - name: Upload devkit
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-devkit-linux-${{ matrix.arch }}
+          path: build/src/devkit/
+      - name: Test
+        if: matrix.arch == 'x86' || matrix.arch == 'x86_64'
+        run: make test
