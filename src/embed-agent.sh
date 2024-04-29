@@ -12,6 +12,7 @@ lipo=$9
 agent_dbghelp_prefix=${10}
 agent_symsrv_prefix=${11}
 
+custom_script="$output_dir/../../../../frida-core/src/anti-anti-frida.py"
 priv_dir="$output_dir/frida-agent@emb"
 
 mkdir -p "$priv_dir"
@@ -90,6 +91,10 @@ case $host_os in
     collect_unix_agent "$agent_legacy" 32
     collect_unix_agent "$agent_emulated_modern" arm64
     collect_unix_agent "$agent_emulated_legacy" arm
+
+    if [ -f "$custom_script" ]; then
+      python3 "$custom_script" "$embedded_agent"
+    fi
 
     exec "$resource_compiler" --toolchain=gnu -c "$resource_config" -o "$output_dir/frida-data-agent" "${embedded_assets[@]}"
     ;;

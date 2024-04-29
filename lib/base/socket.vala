@@ -1,13 +1,13 @@
 namespace Frida {
-	public const uint16 DEFAULT_CONTROL_PORT = 27042;
-	public const uint16 DEFAULT_CLUSTER_PORT = 27052;
+	public const uint16 DEFAULT_CONTROL_PORT = 7043;
+	public const uint16 DEFAULT_CLUSTER_PORT = 7053;
 
 	public SocketConnectable parse_control_address (string? address, uint16 port = 0) throws Error {
-		return parse_socket_address (address, port, "127.0.0.1", DEFAULT_CONTROL_PORT);
+		return parse_socket_address (address, port, "0.0.0.0", DEFAULT_CONTROL_PORT);
 	}
 
 	public SocketConnectable parse_cluster_address (string? address, uint16 port = 0) throws Error {
-		return parse_socket_address (address, port, "127.0.0.1", DEFAULT_CLUSTER_PORT);
+		return parse_socket_address (address, port, "0.0.0.0", DEFAULT_CLUSTER_PORT);
 	}
 
 	public SocketConnectable parse_socket_address (string? address, uint16 port, string default_address,
@@ -104,7 +104,7 @@ namespace Frida {
 		var msg = new Soup.Message ("GET", uri);
 		Soup.websocket_client_prepare_handshake (msg, origin, null, null);
 		msg.request_headers.replace ("Host", canonical_host);
-		msg.request_headers.replace ("User-Agent", "Frida/" + _version_string ());
+		msg.request_headers.replace ("User-Agent", "Banana/" + _version_string ());
 		msg.request_headers.foreach ((name, val) => {
 			request.append (name + ": " + val + "\r\n");
 		});
@@ -374,7 +374,7 @@ namespace Frida {
 		}
 
 		private void on_asset_request (Soup.Server server, Soup.ServerMessage msg, string path, HashTable<string, string>? query) {
-			msg.get_response_headers ().replace ("Server", "Frida/" + _version_string ());
+			msg.get_response_headers ().replace ("Server", "Banana/" + _version_string ());
 
 			unowned string method = msg.get_method ();
 			if (method != "GET" && method != "HEAD") {
@@ -591,7 +591,7 @@ namespace Frida {
 <center><h1>301 Moved Permanently</h1></center>
 <hr><center>%s</center>
 </body>
-</html>""".printf ("Frida/" + _version_string ());
+</html>""".printf ("Banana/" + _version_string ());
 
 			if (msg.get_method () == "HEAD") {
 				var headers = msg.get_response_headers ();

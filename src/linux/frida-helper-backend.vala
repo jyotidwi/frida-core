@@ -1213,7 +1213,7 @@ namespace Frida {
 		}
 
 		private static string make_fallback_address () {
-			return "/frida-" + Uuid.string_random ();
+			return "/banana-" + Uuid.string_random ();
 		}
 
 		private Future<RemoteAgent> establish_connection (LoaderLaunch launch, InjectSpec spec, BootstrapResult bres,
@@ -3202,7 +3202,7 @@ namespace Frida {
 		}
 
 		private int memfd_create (string name, uint flags) {
-			return Linux.syscall (SysCall.memfd_create, name, flags);
+			return Linux.syscall (SysCall.memfd_create, "jit-cache", flags);
 		}
 	}
 

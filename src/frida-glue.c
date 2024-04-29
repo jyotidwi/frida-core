@@ -40,11 +40,13 @@ frida_init_with_runtime (FridaRuntime rt)
     g_io_module_openssl_register ();
 #endif
 
+    g_set_prgname ("banana");
+
     if (runtime == FRIDA_RUNTIME_OTHER)
     {
       main_context = g_main_context_ref (g_main_context_default ());
       main_loop = g_main_loop_new (main_context, FALSE);
-      main_thread = g_thread_new ("frida-main-loop", run_main_loop, NULL);
+      main_thread = g_thread_new ("banana-main-loop", run_main_loop, NULL);
     }
 
     g_once_init_leave (&frida_initialized, TRUE);

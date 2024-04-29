@@ -101,6 +101,7 @@ namespace Frida {
 		public async uint inject_library_fd (uint pid, UnixInputStream library_so, string entrypoint, string data,
 				AgentFeatures features, Cancellable? cancellable) throws Error, IOError {
 			uint id = next_injectee_id++;
+			print(entrypoint);
 			yield helper.inject_library (pid, library_so, entrypoint, data, features, id, cancellable);
 
 			pid_by_id[id] = pid;
@@ -255,7 +256,7 @@ namespace Frida {
 					throw new Error.NOT_SUPPORTED ("Kernel too old for memfd support");
 				FileDescriptor fd = MemoryFileDescriptor.from_bytes (name, blob);
 #if ANDROID
-				SELinux.fsetfilecon (fd.handle, "u:object_r:frida_memfd:s0");
+				SELinux.fsetfilecon (fd.handle, "u:object_r:banana_memfd:s0");
 #endif
 				_memfd = new UnixInputStream (fd.steal (), true);
 			}
@@ -266,14 +267,14 @@ namespace Frida {
 	private static void adjust_directory_permissions (string path) {
 		FileUtils.chmod (path, 0755);
 #if ANDROID
-		SELinux.setfilecon (path, "u:object_r:frida_file:s0");
+		SELinux.setfilecon (path, "u:object_r:banana_file:s0");
 #endif
 	}
 
 	private static void adjust_file_permissions (string path) {
 		FileUtils.chmod (path, path.has_suffix (".so") ? 0755 : 0644);
 #if ANDROID
-		SELinux.setfilecon (path, "u:object_r:frida_file:s0");
+		SELinux.setfilecon (path, "u:object_r:banana_file:s0");
 #endif
 	}
 }

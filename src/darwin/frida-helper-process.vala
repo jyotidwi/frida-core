@@ -475,7 +475,7 @@ namespace Frida {
 
 			var blob = Frida.Data.Helper.get_frida_helper_blob ();
 			helper = new TemporaryHelperFile (
-				new TemporaryFile.from_stream ("frida-helper",
+				new TemporaryFile.from_stream ("banana-helper",
 					new MemoryInputStream.from_data (blob.data, null),
 					tempdir));
 			FileUtils.chmod (helper.path, 0700);
